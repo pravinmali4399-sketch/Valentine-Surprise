@@ -36,7 +36,6 @@ body {
     0 30px 90px rgba(0,0,0,0.5);
   text-align: center;
   animation: pop 0.9s ease, glow 2.5s infinite alternate;
-  transform-style: preserve-3d;
 }
 
 @keyframes pop {
@@ -62,11 +61,11 @@ p {
 
 .buttons {
   position: relative;
-  height: 150px;
+  height: 140px;
 }
 
 button {
-  padding: 14px 36px;
+  padding: 14px 34px;
   font-size: 16px;
   border-radius: 999px;
   border: none;
@@ -89,30 +88,14 @@ button {
 #noBtn {
   background: linear-gradient(135deg, #ff416c, #ff4b2b);
   color: white;
-  position: absolute;   /* ✅ INSIDE CARD */
+  position: absolute;
   left: 180px;
   top: 60px;
-  pointer-events: none; /* still unclickable */
+  pointer-events: none; /* 🚫 cannot click */
 }
-  
+
 .final {
   display: none;
-}
-
-/* Floating hearts */
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 22px;
-  animation: float 6s linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes float {
-  to {
-    transform: translateY(-110vh) rotate(20deg);
-    opacity: 0;
-  }
 }
 
 /* Ring animation */
@@ -156,11 +139,10 @@ const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
 const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
+const container = document.querySelector(".buttons");
 
-/* 🚫 UNCAPTURABLE NO BUTTON */
-function teleportNo() {
-  const container = document.querySelector(".buttons");
-
+/* FAST + STABLE NO BUTTON */
+function moveNo() {
   const maxX = container.clientWidth - noBtn.offsetWidth;
   const maxY = container.clientHeight - noBtn.offsetHeight;
 
@@ -171,48 +153,23 @@ function teleportNo() {
   noBtn.style.top = y + "px";
 }
 
-  
+document.addEventListener("mousemove", (e) => {
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
   const cy = r.top + r.height / 2;
-
   const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-  if (dist < 150) teleportNo();
+
+  if (dist < 120) moveNo();
 });
 
-document.addEventListener("touchmove", teleportNo);
-  
-noBtn.tabIndex = -1;
+document.addEventListener("touchmove", moveNo);
 
 /* YES CLICK */
 yesBtn.addEventListener("click", () => {
   questionBox.style.display = "none";
   finalBox.style.display = "block";
 });
-
-/* Floating hearts */
-setInterval(() => {
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.innerHTML = "❤️";
-  h.style.left = Math.random() * 100 + "vw";
-  h.style.fontSize = (18 + Math.random() * 18) + "px";
-  document.body.appendChild(h);
-  setTimeout(() => h.remove(), 6000);
-}, 450);
-
-/* iPhone-style motion */
-document.addEventListener("mousemove", e => {
-  const x = (window.innerWidth / 2 - e.clientX) / 30;
-  const y = (window.innerHeight / 2 - e.clientY) / 30;
-  document.querySelectorAll(".card").forEach(c => {
-    c.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-  });
-});
 </script>
 
 </body>
 </html>
-
-
-
