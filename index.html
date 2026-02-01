@@ -133,7 +133,7 @@ button {
   <p id="questionText"></p>
 
   <p id="countdown">
-    Press NO or I'll Assuming it as YES:(  <span id="time">45</span> sec
+    Press NO or I'll Assuming it as YES  <span id="time">20</span> sec
   </p>
 
   <div class="buttons">
@@ -164,7 +164,7 @@ const questions = [
 
 let step = 0;
 let timer = null;
-let timeLeft = 45;
+let timeLeft = 25;
 
 const questionText = document.getElementById("questionText");
 const yesBtn = document.getElementById("yesBtn");
@@ -203,7 +203,7 @@ document.addEventListener("touchstart", () => {
 /* START COUNTDOWN */
 function startCountdown() {
   countdown.style.display = "block";
-  timeLeft = 45;
+  timeLeft = 25;
   timeSpan.textContent = timeLeft;
 
   timer = setInterval(() => {
@@ -243,4 +243,5 @@ yesBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
 
