@@ -26,7 +26,7 @@ body {
   transition: background 0.3s ease;
 }
 
-/* FLASH EFFECT */
+/* FLASH */
 .flash {
   background:
     radial-gradient(circle at center, #ffffff, transparent 60%),
@@ -61,16 +61,12 @@ p  { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
   font-size: 16px;
   font-weight: 600;
 }
-
-#countdown.red {
-  color: #ff2e2e;
-}
+#countdown.red { color: #ff2e2e; }
 
 /* SHAKE */
 .shake {
   animation: shake 0.4s infinite;
 }
-
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
@@ -90,7 +86,6 @@ button {
   font-size: 16px;
   border-radius: 999px;
   border: none;
-  cursor: pointer;
   font-weight: 600;
 }
 
@@ -123,7 +118,6 @@ button {
   margin-bottom: 10px;
   animation: ringPop 1.2s ease forwards;
 }
-
 @keyframes ringPop {
   0% { transform: scale(0) rotate(-45deg); opacity: 0; }
   70% { transform: scale(1.4) rotate(10deg); opacity: 1; }
@@ -134,7 +128,7 @@ button {
 
 <body>
 
-<!--PAGE 1-->
+<!-- PAGE 1 : RISK -->
 <div class="card" id="riskBox">
   <h1>⚠️ Warning</h1>
   <p>
@@ -165,7 +159,7 @@ button {
   <h1>Congratulations 🎉</h1>
   <p>
     Nakshatra,<br>
-    you’re officially <b>SCAMMED</b> for life 💍❤️<br><br>
+    you’re officially <b>SCAMMED</b> for life 💍❤️
   </p>
 </div>
 
@@ -177,7 +171,7 @@ button {
 const questions = [
   "Will you be my Valentine? 💖",
   "Are you really sure? 🥺💞",
-  "Last chance to escape -->💍"
+  "Last chance to escape --> 💍"
 ];
 
 let step = 0;
@@ -198,7 +192,7 @@ const finalBox = document.getElementById("finalBox");
 const finalSound = document.getElementById("finalSound");
 const container = document.querySelector(".buttons");
 
-/* RISK PAGE */
+/* START */
 riskBtn.onclick = () => {
   riskBox.classList.add("hidden");
   questionBox.classList.remove("hidden");
@@ -222,7 +216,7 @@ document.addEventListener("mousemove", e => {
   if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
 });
 
-/* START COUNTDOWN */
+/* COUNTDOWN */
 function startCountdown() {
   countdown.style.display = "block";
   timeLeft = 12;
@@ -232,16 +226,11 @@ function startCountdown() {
     timeLeft--;
     timeSpan.textContent = timeLeft;
 
-    // RED at last 12
     if (timeLeft <= 10) countdown.classList.add("red");
-
-    // SHAKE + VIBRATE at last 6
     if (timeLeft <= 8) {
       questionBox.classList.add("shake");
       if (navigator.vibrate) navigator.vibrate(200);
     }
-
-    // FLASH at 3,2,1
     if (timeLeft <= 7 && timeLeft > 0) {
       body.classList.add("flash");
       setTimeout(() => body.classList.remove("flash"), 200);
@@ -259,10 +248,12 @@ yesBtn.onclick = () => {
   step++;
 
   if (step < questions.length) {
+    yesBtn.style.display = "inline-block";
     questionText.innerHTML = questions[step];
 
     if (step === 2) {
-      noBtn.style.display = "inline-block";
+      yesBtn.style.display = "none";          // ❌ hide YES
+      noBtn.style.display = "inline-block";   // ✅ only NO
       startCountdown();
     }
   } else {
@@ -276,11 +267,3 @@ yesBtn.onclick = () => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
