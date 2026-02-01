@@ -36,8 +36,7 @@ body {
     0 0 30px rgba(255,255,255,0.35),
     0 30px 90px rgba(0,0,0,0.5);
   text-align: center;
-  animation: enter 0.8s ease, glow 2.5s infinite alternate;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  animation: enter 0.8s ease;
 }
 
 @keyframes enter {
@@ -45,20 +44,20 @@ body {
   to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-@keyframes glow {
-  from { box-shadow: 0 0 18px rgba(255,255,255,0.25), 0 30px 80px rgba(0,0,0,0.45); }
-  to   { box-shadow: 0 0 45px rgba(255,255,255,0.6), 0 30px 80px rgba(0,0,0,0.45); }
-}
-
-h1 {
-  margin-bottom: 10px;
-  font-weight: 600;
-}
+h1 { margin-bottom: 10px; font-weight: 600; }
 
 p {
   font-size: 14px;
   opacity: 0.9;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
+}
+
+/* COUNTDOWN */
+#countdown {
+  display: none;
+  font-size: 14px;
+  margin-bottom: 22px;
+  opacity: 0.9;
 }
 
 /* BUTTON AREA */
@@ -85,12 +84,6 @@ button:active {
   background: linear-gradient(135deg, #00f260, #0575e6);
   color: white;
   box-shadow: 0 0 22px rgba(0,242,96,0.9);
-  animation: pulse 1.8s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 12px rgba(0,242,96,0.6); }
-  100% { box-shadow: 0 0 32px rgba(0,242,96,1); }
 }
 
 #noBtn {
@@ -99,40 +92,25 @@ button:active {
   position: absolute;
   left: 180px;
   top: 60px;
-  pointer-events: none; /* cannot click */
+  pointer-events: none; /* NOT CLICKABLE */
+  display: none;
 }
 
-/* FINAL SCREEN */
+/* FINAL */
 .final {
   display: none;
 }
 
 .ring {
   font-size: 70px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   animation: ringPop 1.2s ease forwards;
 }
 
 @keyframes ringPop {
-  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
-  70%  { transform: scale(1.4) rotate(10deg); opacity: 1; }
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  70% { transform: scale(1.4) rotate(10deg); opacity: 1; }
   100% { transform: scale(1); }
-}
-
-/* FLOATING HEARTS */
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 18px;
-  opacity: 0.75;
-  animation: float 7s linear infinite;
-}
-
-@keyframes float {
-  to {
-    transform: translateY(-110vh) rotate(15deg);
-    opacity: 0;
-  }
 }
 </style>
 </head>
@@ -141,7 +119,11 @@ button:active {
 
 <div class="card" id="questionBox">
   <h1>Bubbhu 🐶💖</h1>
-  <p>Will you be my Valentine?<br>Plzz try to say NO 😏</p>
+  <p id="questionText"></p>
+
+  <p id="countdown">
+    Auto selecting YES in <b><span id="time">100</span></b> seconds ⏳
+  </p>
 
   <div class="buttons">
     <button id="yesBtn">Yes ❤️</button>
@@ -160,13 +142,29 @@ button:active {
 </div>
 
 <script>
-const noBtn = document.getElementById("noBtn");
+const questions = [
+  "Will you be my Valentine? 💖",
+  "Are you really sure? 🥺💞",
+  "Last chance to escape… 😈💍"
+];
+
+let step = 0;
+let timer = null;
+let timeLeft = 100;
+
+const questionText = document.getElementById("questionText");
 const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const countdown = document.getElementById("countdown");
+const timeSpan = document.getElementById("time");
 const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
 const container = document.querySelector(".buttons");
 
-/* Move NO inside card */
+/* INIT */
+questionText.innerHTML = questions[step];
+
+/* MOVE NO inside card */
 function moveNo() {
   const maxX = container.clientWidth - noBtn.offsetWidth;
   const maxY = container.clientHeight - noBtn.offsetHeight;
@@ -175,37 +173,63 @@ function moveNo() {
   noBtn.style.top  = Math.random() * maxY + "px";
 }
 
-/* Desktop */
+/* NO ESCAPE ONLY ON STEP 3 */
 document.addEventListener("mousemove", (e) => {
+  if (step !== 2) return;
+
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
   const cy = r.top  + r.height / 2;
-  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
+
+  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) {
+    moveNo();
+  }
 });
 
-/* Mobile */
-document.addEventListener("touchstart", moveNo, { passive: true });
+document.addEventListener("touchstart", () => {
+  if (step === 2) moveNo();
+}, { passive: true });
 
-/* YES */
+/* START COUNTDOWN */
+function startCountdown() {
+  countdown.style.display = "block";
+  timeLeft = 100;
+  timeSpan.textContent = timeLeft;
+
+  timer = setInterval(() => {
+    timeLeft--;
+    timeSpan.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      yesBtn.click(); // AUTO YES
+    }
+  }, 1000);
+}
+
+/* YES CLICK */
 yesBtn.addEventListener("click", () => {
-  questionBox.style.opacity = "0";
-  questionBox.style.transform = "scale(0.95)";
-  setTimeout(() => {
+  step++;
+
+  if (step < questions.length) {
+    questionText.style.opacity = "0";
+
+    setTimeout(() => {
+      questionText.innerHTML = questions[step];
+      questionText.style.opacity = "1";
+
+      if (step === 2) {
+        noBtn.style.display = "inline-block";
+        startCountdown();
+      }
+    }, 200);
+
+  } else {
+    clearInterval(timer);
     questionBox.style.display = "none";
     finalBox.style.display = "block";
-  }, 300);
+  }
 });
-
-/* Floating hearts */
-setInterval(() => {
-  const h = document.createElement("div");
-  h.className = "heart";
-  h.innerHTML = "❤️";
-  h.style.left = Math.random() * 100 + "vw";
-  h.style.fontSize = (14 + Math.random() * 14) + "px";
-  document.body.appendChild(h);
-  setTimeout(() => h.remove(), 7000);
-}, 800);
 </script>
 
 </body>
