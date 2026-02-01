@@ -118,11 +118,11 @@ button:active {
 <body>
 
 <div class="card" id="questionBox">
-  <h1>Bubbhu 🐶💖</h1>
+  <h1>Bubbhu 🐶</h1>
   <p id="questionText"></p>
 
   <p id="countdown">
-    Auto selecting YES in <b><span id="time">100</span></b> seconds ⏳
+   Click NO! or I will Assuming it asYES<b><span id="time">45</span></b> seconds ⏳
   </p>
 
   <div class="buttons">
@@ -150,7 +150,7 @@ const questions = [
 
 let step = 0;
 let timer = null;
-let timeLeft = 100;
+let timeLeft = 45;
 
 const questionText = document.getElementById("questionText");
 const yesBtn = document.getElementById("yesBtn");
@@ -193,7 +193,7 @@ document.addEventListener("touchstart", () => {
 /* START COUNTDOWN */
 function startCountdown() {
   countdown.style.display = "block";
-  timeLeft = 100;
+  timeLeft = 45;
   timeSpan.textContent = timeLeft;
 
   timer = setInterval(() => {
@@ -234,3 +234,4 @@ yesBtn.addEventListener("click", () => {
 
 </body>
 </html>
+
