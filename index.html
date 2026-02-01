@@ -144,7 +144,7 @@ button {
   <p id="questionText"></p>
 
   <p id="countdown">
-    ⏳ Auto selecting YES in <span id="time">12</span> sec
+    ⏳ Auto selecting YES in <span id="time">15</span> sec
   </p>
 
   <div class="buttons">
@@ -176,7 +176,7 @@ const questions = [
 
 let step = 0;
 let timer;
-let timeLeft = 12;
+let timeLeft = 15;
 
 const body = document.body;
 const riskBox = document.getElementById("riskBox");
@@ -219,7 +219,7 @@ document.addEventListener("mousemove", e => {
 /* COUNTDOWN */
 function startCountdown() {
   countdown.style.display = "block";
-  timeLeft = 12;
+  timeLeft = 15;
   timeSpan.textContent = timeLeft;
 
   timer = setInterval(() => {
@@ -267,3 +267,4 @@ yesBtn.onclick = () => {
 
 </body>
 </html>
+
