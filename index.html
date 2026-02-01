@@ -48,16 +48,8 @@ body {
   to { box-shadow: 0 0 50px rgba(255,255,255,0.7), 0 30px 80px rgba(0,0,0,0.45); }
 }
 
-h1 {
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-p {
-  font-size: 14px;
-  opacity: 0.9;
-  margin-bottom: 30px;
-}
+h1 { margin-bottom: 12px; font-weight: 600; }
+p  { font-size: 14px; opacity: 0.9; margin-bottom: 28px; }
 
 .buttons {
   position: relative;
@@ -88,15 +80,13 @@ button {
 #noBtn {
   background: linear-gradient(135deg, #ff416c, #ff4b2b);
   color: white;
-  position: absolute;
+  position: absolute;      /* stays inside card */
   left: 180px;
   top: 60px;
-  pointer-events: none; /* 🚫 cannot click */
+  pointer-events: none;    /* 🚫 never clickable */
 }
 
-.final {
-  display: none;
-}
+.final { display: none; }
 
 /* Ring animation */
 .ring {
@@ -115,7 +105,7 @@ button {
 <body>
 
 <div class="card" id="questionBox">
-  <h1>Bubbhuu ❤️</h1>
+  <h1>Bubbhu 🐶</h1>
   <p>Will you be my Valentine?<br>Plzz try to say NO 😏</p>
 
   <div class="buttons">
@@ -129,7 +119,7 @@ button {
   <h1>Congratulations 🎉</h1>
   <p>
     Nakshatra,<br>
-    You’re officially SCAMMED for life 💍❤️<br>
+    you’re officially SCAMMED for life 💍❤️<br>
     Happy Valentine’s 💕
   </p>
 </div>
@@ -141,28 +131,44 @@ const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
 const container = document.querySelector(".buttons");
 
-/* FAST + STABLE NO BUTTON */
+/* 🔊 Android vibration helper */
+function vibrate(ms = 40) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+/* FAST + STABLE movement inside the card */
 function moveNo() {
   const maxX = container.clientWidth - noBtn.offsetWidth;
   const maxY = container.clientHeight - noBtn.offsetHeight;
 
-  const x = Math.random() * maxX;
-  const y = Math.random() * maxY;
+  const x = Math.random() * Math.max(0, maxX);
+  const y = Math.random() * Math.max(0, maxY);
 
   noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
+  noBtn.style.top  = y + "px";
+
+  vibrate(35); // subtle haptic on Android
 }
 
+/* DESKTOP: escape before hover */
 document.addEventListener("mousemove", (e) => {
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
-  const cy = r.top + r.height / 2;
+  const cy = r.top  + r.height / 2;
   const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
 
   if (dist < 120) moveNo();
 });
 
-document.addEventListener("touchmove", moveNo);
+/* MOBILE: instant escape on any intent */
+document.addEventListener("touchstart", (e) => {
+  // if touch starts anywhere near the card, move NO
+  moveNo();
+}, { passive: true });
+
+document.addEventListener("touchmove", () => {
+  moveNo();
+}, { passive: true });
 
 /* YES CLICK */
 yesBtn.addEventListener("click", () => {
@@ -173,5 +179,3 @@ yesBtn.addEventListener("click", () => {
 
 </body>
 </html>
-
-
