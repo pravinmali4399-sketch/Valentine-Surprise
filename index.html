@@ -55,12 +55,29 @@ p {
 /* COUNTDOWN */
 #countdown {
   display: none;
-  font-size: 14px;
-  margin-bottom: 22px;
-  opacity: 0.9;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
-/* BUTTON AREA */
+#countdown.red {
+  color: #ff2e2e;
+}
+
+/* SHAKE EFFECT */
+.shake {
+  animation: shake 0.4s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+/* BUTTONS */
 .buttons {
   position: relative;
   height: 140px;
@@ -73,11 +90,6 @@ button {
   border: none;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s ease;
-}
-
-button:active {
-  transform: scale(0.95);
 }
 
 #yesBtn {
@@ -92,14 +104,12 @@ button:active {
   position: absolute;
   left: 180px;
   top: 60px;
-  pointer-events: none; /* NOT CLICKABLE */
+  pointer-events: none;
   display: none;
 }
 
 /* FINAL */
-.final {
-  display: none;
-}
+.final { display: none; }
 
 .ring {
   font-size: 70px;
@@ -118,11 +128,12 @@ button:active {
 <body>
 
 <div class="card" id="questionBox">
-  <h1>Bubbhu 🐶</h1>
+  <h1>Bubbhu 🐶💖</h1>
+
   <p id="questionText"></p>
 
   <p id="countdown">
-   Click NO! or I will Assuming it asYES<b><span id="time">45</span></b> seconds ⏳
+    Click NO! or I will assuming it as YES :( <span id="time">45</span> sec
   </p>
 
   <div class="buttons">
@@ -136,10 +147,13 @@ button:active {
   <h1>Congratulations 🎉</h1>
   <p>
     Nakshatra,<br>
-    you’re officially <b>SCAMMED</b> for life 💍❤️<br>
-    Happy Valentine’s 💕
+    you’re officially <b>SCAMMED</b> for life 💍❤️<br><br>   
   </p>
 </div>
+
+<audio id="finalSound">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 const questions = [
@@ -159,31 +173,27 @@ const countdown = document.getElementById("countdown");
 const timeSpan = document.getElementById("time");
 const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
+const finalSound = document.getElementById("finalSound");
 const container = document.querySelector(".buttons");
 
 /* INIT */
 questionText.innerHTML = questions[step];
 
-/* MOVE NO inside card */
+/* MOVE NO */
 function moveNo() {
   const maxX = container.clientWidth - noBtn.offsetWidth;
   const maxY = container.clientHeight - noBtn.offsetHeight;
-
   noBtn.style.left = Math.random() * maxX + "px";
   noBtn.style.top  = Math.random() * maxY + "px";
 }
 
-/* NO ESCAPE ONLY ON STEP 3 */
+/* NO ESCAPE ONLY STEP 3 */
 document.addEventListener("mousemove", (e) => {
   if (step !== 2) return;
-
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
-  const cy = r.top  + r.height / 2;
-
-  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) {
-    moveNo();
-  }
+  const cy = r.top + r.height / 2;
+  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
 });
 
 document.addEventListener("touchstart", () => {
@@ -200,9 +210,12 @@ function startCountdown() {
     timeLeft--;
     timeSpan.textContent = timeLeft;
 
+    if (timeLeft <= 10) countdown.classList.add("red");
+    if (timeLeft <= 5) questionBox.classList.add("shake");
+
     if (timeLeft <= 0) {
       clearInterval(timer);
-      yesBtn.click(); // AUTO YES
+      yesBtn.click();
     }
   }, 1000);
 }
@@ -212,26 +225,21 @@ yesBtn.addEventListener("click", () => {
   step++;
 
   if (step < questions.length) {
-    questionText.style.opacity = "0";
+    questionText.innerHTML = questions[step];
 
-    setTimeout(() => {
-      questionText.innerHTML = questions[step];
-      questionText.style.opacity = "1";
-
-      if (step === 2) {
-        noBtn.style.display = "inline-block";
-        startCountdown();
-      }
-    }, 200);
+    if (step === 2) {
+      noBtn.style.display = "inline-block";
+      startCountdown();
+    }
 
   } else {
     clearInterval(timer);
     questionBox.style.display = "none";
     finalBox.style.display = "block";
+    finalSound.play();
   }
 });
 </script>
 
 </body>
 </html>
-
