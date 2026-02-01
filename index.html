@@ -23,6 +23,14 @@ body {
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
   color: white;
+  transition: background 0.3s ease;
+}
+
+/* FLASH EFFECT */
+.flash {
+  background:
+    radial-gradient(circle at center, #ffffff, transparent 60%),
+    linear-gradient(135deg, #ff0000, #ff9900) !important;
 }
 
 /* CARD */
@@ -44,27 +52,21 @@ body {
   to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-h1 { margin-bottom: 10px; font-weight: 600; }
-
-p {
-  font-size: 14px;
-  opacity: 0.9;
-  margin-bottom: 18px;
-}
+h1 { margin-bottom: 12px; font-weight: 600; }
+p  { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
 
 /* COUNTDOWN */
 #countdown {
   display: none;
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 20px;
 }
 
 #countdown.red {
   color: #ff2e2e;
 }
 
-/* SHAKE EFFECT */
+/* SHAKE */
 .shake {
   animation: shake 0.4s infinite;
 }
@@ -92,15 +94,19 @@ button {
   font-weight: 600;
 }
 
-#yesBtn {
+.primary {
   background: linear-gradient(135deg, #00f260, #0575e6);
   color: white;
   box-shadow: 0 0 22px rgba(0,242,96,0.9);
 }
 
-#noBtn {
+.danger {
   background: linear-gradient(135deg, #ff416c, #ff4b2b);
   color: white;
+}
+
+/* NO button */
+#noBtn {
   position: absolute;
   left: 180px;
   top: 60px;
@@ -108,9 +114,10 @@ button {
   display: none;
 }
 
-/* FINAL */
-.final { display: none; }
+/* HIDE */
+.hidden { display: none; }
 
+/* FINAL */
 .ring {
   font-size: 70px;
   margin-bottom: 10px;
@@ -127,27 +134,39 @@ button {
 
 <body>
 
-<div class="card" id="questionBox">
-  <h1>Bubbhu 🐶💖</h1>
+<!-- RISK PAGE -->
+<div class="card" id="riskBox">
+  <h1>⚠️ Warning</h1>
+  <p>
+    Please click the button below at your own risk 😈<br>
+    You might get <b>SCAMMED</b> 💀
+  </p>
+  <button class="primary" id="riskBtn">I Understand 😬</button>
+</div>
 
+<!-- QUESTIONS -->
+<div class="card hidden" id="questionBox">
+  <h1>Bubbhu 🐶💖</h1>
   <p id="questionText"></p>
 
   <p id="countdown">
-    Press NO or I'll Assuming it as YES  <span id="time">20</span> sec
+    ⏳ Auto selecting YES in <span id="time">20</span> sec
   </p>
 
   <div class="buttons">
-    <button id="yesBtn">Yes ❤️</button>
-    <button id="noBtn">No 💔</button>
+    <button id="yesBtn" class="primary">Yes ❤️</button>
+    <button id="noBtn" class="danger">No 💔</button>
   </div>
 </div>
 
-<div class="card final" id="finalBox">
+<!-- FINAL -->
+<div class="card hidden" id="finalBox">
   <div class="ring">💍</div>
   <h1>Congratulations 🎉</h1>
   <p>
     Nakshatra,<br>
-    you’re officially <b>SCAMMED</b> for life 💍❤️<br><br>   
+    you’re officially <b>SCAMMED</b> for life 💍❤️<br><br>
+    <b>Click NO! or I will assuming it as YES 😈</b>
   </p>
 </div>
 
@@ -163,21 +182,29 @@ const questions = [
 ];
 
 let step = 0;
-let timer = null;
-let timeLeft = 25;
+let timer;
+let timeLeft = 20;
 
+const body = document.body;
+const riskBox = document.getElementById("riskBox");
+const riskBtn = document.getElementById("riskBtn");
+
+const questionBox = document.getElementById("questionBox");
 const questionText = document.getElementById("questionText");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const countdown = document.getElementById("countdown");
 const timeSpan = document.getElementById("time");
-const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
 const finalSound = document.getElementById("finalSound");
 const container = document.querySelector(".buttons");
 
-/* INIT */
-questionText.innerHTML = questions[step];
+/* RISK PAGE */
+riskBtn.onclick = () => {
+  riskBox.classList.add("hidden");
+  questionBox.classList.remove("hidden");
+  questionText.innerHTML = questions[step];
+};
 
 /* MOVE NO */
 function moveNo() {
@@ -187,8 +214,8 @@ function moveNo() {
   noBtn.style.top  = Math.random() * maxY + "px";
 }
 
-/* NO ESCAPE ONLY STEP 3 */
-document.addEventListener("mousemove", (e) => {
+/* NO ESCAPE */
+document.addEventListener("mousemove", e => {
   if (step !== 2) return;
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
@@ -196,22 +223,30 @@ document.addEventListener("mousemove", (e) => {
   if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
 });
 
-document.addEventListener("touchstart", () => {
-  if (step === 2) moveNo();
-}, { passive: true });
-
 /* START COUNTDOWN */
 function startCountdown() {
   countdown.style.display = "block";
-  timeLeft = 25;
+  timeLeft = 20;
   timeSpan.textContent = timeLeft;
 
   timer = setInterval(() => {
     timeLeft--;
     timeSpan.textContent = timeLeft;
 
+    // RED at last 10
     if (timeLeft <= 10) countdown.classList.add("red");
-    if (timeLeft <= 5) questionBox.classList.add("shake");
+
+    // SHAKE + VIBRATE at last 5
+    if (timeLeft <= 5) {
+      questionBox.classList.add("shake");
+      if (navigator.vibrate) navigator.vibrate(200);
+    }
+
+    // FLASH at 3,2,1
+    if (timeLeft <= 3 && timeLeft > 0) {
+      body.classList.add("flash");
+      setTimeout(() => body.classList.remove("flash"), 200);
+    }
 
     if (timeLeft <= 0) {
       clearInterval(timer);
@@ -220,8 +255,8 @@ function startCountdown() {
   }, 1000);
 }
 
-/* YES CLICK */
-yesBtn.addEventListener("click", () => {
+/* YES */
+yesBtn.onclick = () => {
   step++;
 
   if (step < questions.length) {
@@ -231,17 +266,14 @@ yesBtn.addEventListener("click", () => {
       noBtn.style.display = "inline-block";
       startCountdown();
     }
-
   } else {
     clearInterval(timer);
-    questionBox.style.display = "none";
-    finalBox.style.display = "block";
+    questionBox.classList.add("hidden");
+    finalBox.classList.remove("hidden");
     finalSound.play();
   }
-});
+};
 </script>
 
 </body>
 </html>
-
-
