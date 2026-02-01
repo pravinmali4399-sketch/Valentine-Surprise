@@ -159,13 +159,24 @@ const finalBox = document.getElementById("finalBox");
 
 /* 🚫 UNCAPTURABLE NO BUTTON */
 function teleportNo() {
-  const padding = 30;
-  const maxX = window.innerWidth - noBtn.offsetWidth - padding;
-  const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+  const padding = 20;
 
-  noBtn.style.left = Math.random() * maxX + "px";
-  noBtn.style.top = Math.random() * maxY + "px";
-  noBtn.style.transform = `rotate(${Math.random()*360}deg) scale(1.15)`;
+  const screenW = window.innerWidth;
+  const screenH = window.innerHeight;
+
+  // restrict to center 50% of screen
+  const minX = screenW * 0.25;
+  const maxX = screenW * 0.75 - noBtn.offsetWidth - padding;
+
+  const minY = screenH * 0.25;
+  const maxY = screenH * 0.75 - noBtn.offsetHeight - padding;
+
+  const x = minX + Math.random() * (maxX - minX);
+  const y = minY + Math.random() * (maxY - minY);
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+  noBtn.style.transform = `rotate(${Math.random() * 360}deg) scale(1.15)`;
 }
 
 document.addEventListener("mousemove", (e) => {
@@ -209,3 +220,4 @@ document.addEventListener("mousemove", e => {
 
 </body>
 </html>
+
