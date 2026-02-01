@@ -25,6 +25,7 @@ body {
   color: white;
 }
 
+/* CARD */
 .card {
   width: 360px;
   padding: 42px 30px;
@@ -32,25 +33,35 @@ body {
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(20px);
   box-shadow:
-    0 0 30px rgba(255,255,255,0.4),
+    0 0 30px rgba(255,255,255,0.35),
     0 30px 90px rgba(0,0,0,0.5);
   text-align: center;
-  animation: pop 0.9s ease, glow 2.5s infinite alternate;
+  animation: enter 0.8s ease, glow 2.5s infinite alternate;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-@keyframes pop {
-  from { transform: scale(0.85) translateY(50px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+@keyframes enter {
+  from { transform: scale(0.9) translateY(40px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 @keyframes glow {
-  from { box-shadow: 0 0 20px rgba(255,255,255,0.3), 0 30px 80px rgba(0,0,0,0.45); }
-  to { box-shadow: 0 0 50px rgba(255,255,255,0.7), 0 30px 80px rgba(0,0,0,0.45); }
+  from { box-shadow: 0 0 18px rgba(255,255,255,0.25), 0 30px 80px rgba(0,0,0,0.45); }
+  to   { box-shadow: 0 0 45px rgba(255,255,255,0.6), 0 30px 80px rgba(0,0,0,0.45); }
 }
 
-h1 { margin-bottom: 12px; font-weight: 600; }
-p  { font-size: 14px; opacity: 0.9; margin-bottom: 28px; }
+h1 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
 
+p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 28px;
+}
+
+/* BUTTON AREA */
 .buttons {
   position: relative;
   height: 140px;
@@ -63,12 +74,17 @@ button {
   border: none;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.95);
 }
 
 #yesBtn {
   background: linear-gradient(135deg, #00f260, #0575e6);
   color: white;
-  box-shadow: 0 0 25px rgba(0,242,96,0.9);
+  box-shadow: 0 0 22px rgba(0,242,96,0.9);
   animation: pulse 1.8s infinite;
 }
 
@@ -80,24 +96,43 @@ button {
 #noBtn {
   background: linear-gradient(135deg, #ff416c, #ff4b2b);
   color: white;
-  position: absolute;      /* stays inside card */
+  position: absolute;
   left: 180px;
   top: 60px;
-  pointer-events: none;    /* 🚫 never clickable */
+  pointer-events: none; /* cannot click */
 }
 
-.final { display: none; }
+/* FINAL SCREEN */
+.final {
+  display: none;
+}
 
-/* Ring animation */
 .ring {
   font-size: 70px;
+  margin-bottom: 8px;
   animation: ringPop 1.2s ease forwards;
 }
 
 @keyframes ringPop {
-  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-  70% { transform: scale(1.4) rotate(10deg); opacity: 1; }
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  70%  { transform: scale(1.4) rotate(10deg); opacity: 1; }
   100% { transform: scale(1); }
+}
+
+/* FLOATING HEARTS */
+.heart {
+  position: fixed;
+  bottom: -20px;
+  font-size: 18px;
+  opacity: 0.75;
+  animation: float 7s linear infinite;
+}
+
+@keyframes float {
+  to {
+    transform: translateY(-110vh) rotate(15deg);
+    opacity: 0;
+  }
 }
 </style>
 </head>
@@ -105,7 +140,7 @@ button {
 <body>
 
 <div class="card" id="questionBox">
-  <h1>Bubbhu 🐶</h1>
+  <h1>Bubbhu 🐶💖</h1>
   <p>Will you be my Valentine?<br>Plzz try to say NO 😏</p>
 
   <div class="buttons">
@@ -119,7 +154,7 @@ button {
   <h1>Congratulations 🎉</h1>
   <p>
     Nakshatra,<br>
-    you’re officially SCAMMED for life 💍❤️<br>
+    you’re officially <b>SCAMMED</b> for life 💍❤️<br>
     Happy Valentine’s 💕
   </p>
 </div>
@@ -131,50 +166,46 @@ const questionBox = document.getElementById("questionBox");
 const finalBox = document.getElementById("finalBox");
 const container = document.querySelector(".buttons");
 
-/* 🔊 Android vibration helper */
-function vibrate(ms = 40) {
-  if (navigator.vibrate) navigator.vibrate(ms);
-}
-
-/* FAST + STABLE movement inside the card */
+/* Move NO inside card */
 function moveNo() {
   const maxX = container.clientWidth - noBtn.offsetWidth;
   const maxY = container.clientHeight - noBtn.offsetHeight;
 
-  const x = Math.random() * Math.max(0, maxX);
-  const y = Math.random() * Math.max(0, maxY);
-
-  noBtn.style.left = x + "px";
-  noBtn.style.top  = y + "px";
-
-  vibrate(35); // subtle haptic on Android
+  noBtn.style.left = Math.random() * maxX + "px";
+  noBtn.style.top  = Math.random() * maxY + "px";
 }
 
-/* DESKTOP: escape before hover */
+/* Desktop */
 document.addEventListener("mousemove", (e) => {
   const r = noBtn.getBoundingClientRect();
   const cx = r.left + r.width / 2;
   const cy = r.top  + r.height / 2;
-  const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-
-  if (dist < 120) moveNo();
+  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
 });
 
-/* MOBILE: instant escape on any intent */
-document.addEventListener("touchstart", (e) => {
-  // if touch starts anywhere near the card, move NO
-  moveNo();
-}, { passive: true });
+/* Mobile */
+document.addEventListener("touchstart", moveNo, { passive: true });
 
-document.addEventListener("touchmove", () => {
-  moveNo();
-}, { passive: true });
-
-/* YES CLICK */
+/* YES */
 yesBtn.addEventListener("click", () => {
-  questionBox.style.display = "none";
-  finalBox.style.display = "block";
+  questionBox.style.opacity = "0";
+  questionBox.style.transform = "scale(0.95)";
+  setTimeout(() => {
+    questionBox.style.display = "none";
+    finalBox.style.display = "block";
+  }, 300);
 });
+
+/* Floating hearts */
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerHTML = "❤️";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.fontSize = (14 + Math.random() * 14) + "px";
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 7000);
+}, 800);
 </script>
 
 </body>
