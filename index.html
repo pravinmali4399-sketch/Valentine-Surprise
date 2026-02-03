@@ -23,47 +23,52 @@ body {
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
   color: white;
-  transition: background 0.3s ease;
+  transition: background 0.4s ease;
 }
 
-/* FLASH */
+/* Calm final background */
+.calm {
+  background:
+    radial-gradient(circle at top, #fbc2eb, transparent 50%),
+    linear-gradient(135deg, #a18cd1, #fbc2eb);
+}
+
+/* Flash */
 .flash {
   background:
     radial-gradient(circle at center, #ffffff, transparent 60%),
     linear-gradient(135deg, #ff0000, #ff9900) !important;
 }
 
-/* CARD */
+/* Card */
 .card {
   width: 360px;
   padding: 42px 30px;
   border-radius: 26px;
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(20px);
-  box-shadow:
-    0 0 30px rgba(255,255,255,0.35),
-    0 30px 90px rgba(0,0,0,0.5);
+  box-shadow: 0 30px 90px rgba(0,0,0,0.5);
   text-align: center;
-  animation: enter 0.8s ease;
+  animation: enter 0.7s ease;
 }
 
 @keyframes enter {
-  from { transform: scale(0.9) translateY(40px); opacity: 0; }
-  to   { transform: scale(1) translateY(0); opacity: 1; }
+  from { transform: scale(0.9) translateY(30px); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 h1 { margin-bottom: 12px; font-weight: 600; }
-p  { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
+p { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
 
-/* COUNTDOWN */
+/* Countdown */
 #countdown {
   display: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 }
 #countdown.red { color: #ff2e2e; }
 
-/* SHAKE */
+/* Shake */
 .shake {
   animation: shake 0.4s infinite;
 }
@@ -75,7 +80,7 @@ p  { font-size: 14px; opacity: 0.9; margin-bottom: 18px; }
   100% { transform: translateX(0); }
 }
 
-/* BUTTONS */
+/* Buttons */
 .buttons {
   position: relative;
   height: 140px;
@@ -92,7 +97,6 @@ button {
 .primary {
   background: linear-gradient(135deg, #00f260, #0575e6);
   color: white;
-  box-shadow: 0 0 22px rgba(0,242,96,0.9);
 }
 
 .danger {
@@ -100,7 +104,7 @@ button {
   color: white;
 }
 
-/* NO button */
+/* No button */
 #noBtn {
   position: absolute;
   left: 180px;
@@ -109,18 +113,17 @@ button {
   display: none;
 }
 
-/* HIDE */
 .hidden { display: none; }
 
-/* FINAL */
+/* Final */
 .ring {
   font-size: 70px;
   margin-bottom: 10px;
   animation: ringPop 1.2s ease forwards;
 }
 @keyframes ringPop {
-  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-  70% { transform: scale(1.4) rotate(10deg); opacity: 1; }
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.4); opacity: 1; }
   100% { transform: scale(1); }
 }
 </style>
@@ -128,23 +131,20 @@ button {
 
 <body>
 
-<!-- PAGE 1 : RISK -->
+<!-- Risk -->
 <div class="card" id="riskBox">
   <h1>⚠️ Warning</h1>
-  <p>
-    Please click the button below at your own risk 😬<br>
-    You might get <b>SCAMMED</b> 💀
-  </p>
+  <p>You might get <b>SCAMMED</b> 😬</p>
   <button class="primary" id="riskBtn">I Understand</button>
 </div>
 
-<!-- QUESTIONS -->
+<!-- Questions -->
 <div class="card hidden" id="questionBox">
-  <h1>Bubbhu 🐶</h1>
+  <h1 id="titleText"></h1>
   <p id="questionText"></p>
 
   <p id="countdown">
-   Click NO!, or I’ll take it as YES ✅ <span id="time">15</span> 
+    ⏳ Waiting for decision… <span id="time">15</span>
   </p>
 
   <div class="buttons">
@@ -153,13 +153,14 @@ button {
   </div>
 </div>
 
-<!-- FINAL -->
+<!-- Final -->
 <div class="card hidden" id="finalBox">
   <div class="ring">💍</div>
-  <h1>Congratulations!</h1>
+  <h1>Congratulations 😌</h1>
   <p>
-    Nakshatra :)<br>
-    you’re officially <b>SCAMMED</b> for life 💍❤️
+    Nakshatra 💕<br>
+    You’re officially <b>SCAMMED</b> for life 💍❤️<br><br>
+    And I wouldn’t want it any other way 🙂
   </p>
 </div>
 
@@ -168,10 +169,10 @@ button {
 </audio>
 
 <script>
-const questions = [
-  "Will you be my Valentine? 💖",
-  "Are you really sure? 🥺💞",
-  "Last chance to escape --> 💍"
+const steps = [
+  { title: "Hey Nakshatra 💖", text: "Will you be my Valentine?" },
+  { title: "Wait… 😌", text: "Are you really sure?" },
+  { title: "One Last Thing… 😌", text: "Last chance to escape…" }
 ];
 
 let step = 0;
@@ -180,43 +181,46 @@ let timeLeft = 15;
 
 const body = document.body;
 const riskBox = document.getElementById("riskBox");
-const riskBtn = document.getElementById("riskBtn");
-
 const questionBox = document.getElementById("questionBox");
+const finalBox = document.getElementById("finalBox");
+const titleText = document.getElementById("titleText");
 const questionText = document.getElementById("questionText");
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
 const countdown = document.getElementById("countdown");
 const timeSpan = document.getElementById("time");
-const finalBox = document.getElementById("finalBox");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
 const finalSound = document.getElementById("finalSound");
 const container = document.querySelector(".buttons");
 
-/* START */
+/* Typing effect */
+function typeText(el, text, speed = 40) {
+  el.innerHTML = "";
+  let i = 0;
+  const t = setInterval(() => {
+    el.innerHTML += text[i++];
+    if (i >= text.length) clearInterval(t);
+  }, speed);
+}
+
+/* Start */
 riskBtn.onclick = () => {
   riskBox.classList.add("hidden");
   questionBox.classList.remove("hidden");
-  questionText.innerHTML = questions[step];
+  typeText(titleText, steps[0].title);
+  typeText(questionText, steps[0].text, 30);
 };
 
-/* MOVE NO */
+/* Move NO */
 function moveNo() {
-  const maxX = container.clientWidth - noBtn.offsetWidth;
-  const maxY = container.clientHeight - noBtn.offsetHeight;
-  noBtn.style.left = Math.random() * maxX + "px";
-  noBtn.style.top  = Math.random() * maxY + "px";
+  noBtn.style.left = Math.random() * (container.clientWidth - noBtn.offsetWidth) + "px";
+  noBtn.style.top = Math.random() * (container.clientHeight - noBtn.offsetHeight) + "px";
 }
 
-/* NO ESCAPE */
 document.addEventListener("mousemove", e => {
-  if (step !== 2) return;
-  const r = noBtn.getBoundingClientRect();
-  const cx = r.left + r.width / 2;
-  const cy = r.top + r.height / 2;
-  if (Math.hypot(e.clientX - cx, e.clientY - cy) < 120) moveNo();
+  if (step === 2) moveNo();
 });
 
-/* COUNTDOWN */
+/* Countdown */
 function startCountdown() {
   countdown.style.display = "block";
   timeLeft = 15;
@@ -227,11 +231,9 @@ function startCountdown() {
     timeSpan.textContent = timeLeft;
 
     if (timeLeft <= 10) countdown.classList.add("red");
-    if (timeLeft <= 8) {
-      questionBox.classList.add("shake");
-      if (navigator.vibrate) navigator.vibrate(200);
-    }
-    if (timeLeft <= 7 && timeLeft > 0) {
+    if (timeLeft <= 8) questionBox.classList.add("shake");
+    if (timeLeft <= 3 && timeLeft > 0) {
+      countdown.innerHTML = "Deciding for you… <span id='time'>" + timeLeft + "</span>";
       body.classList.add("flash");
       setTimeout(() => body.classList.remove("flash"), 200);
     }
@@ -246,27 +248,30 @@ function startCountdown() {
 /* YES */
 yesBtn.onclick = () => {
   step++;
-
-  if (step < questions.length) {
-    yesBtn.style.display = "inline-block";
-    questionText.innerHTML = questions[step];
+  if (step < steps.length) {
+    typeText(titleText, steps[step].title);
+    typeText(questionText, steps[step].text, 30);
 
     if (step === 2) {
-      yesBtn.style.display = "none";          // ❌ hide YES
-      noBtn.style.display = "inline-block";   // ✅ only NO
+      yesBtn.style.display = "none";
+      noBtn.style.display = "inline-block";
       startCountdown();
     }
   } else {
-    clearInterval(timer);
+    body.classList.add("calm");
     questionBox.classList.add("hidden");
     finalBox.classList.remove("hidden");
+    finalSound.volume = 0;
     finalSound.play();
+    let v = 0;
+    const fade = setInterval(() => {
+      v += 0.05;
+      finalSound.volume = v;
+      if (v >= 1) clearInterval(fade);
+    }, 200);
   }
 };
 </script>
 
 </body>
 </html>
-
-
-
